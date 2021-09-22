@@ -3,12 +3,12 @@
 Web service made with Flask which takes weather data and aggregate it
 ## How to install
 1. add environment variable `Weather_API_Key` with API key from http://weatherapi.com
-2. `pip install requirements.txt`
+2. `pip install -r requirements.txt`
 ## How to run
 1. `flask run`
-2. `GET \weather?city=<city>&days=<days>` where `<city>` is the name of city and `<days>` is the number of days for aggregating
+2. `GET \weather?city=<city>&days=<n>` where `<city>` is the name of city and `<n>` is the number of days for aggregating
 ## Response
-As a result you you get a `.json` which contains information about temperature, humidity and pressure for the last `<days>` days
+As a result you you get a `.json` which contains information about temperature, humidity and pressure for the last `<n>` days
 ### Example
 ```
 {
