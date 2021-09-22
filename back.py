@@ -2,7 +2,7 @@ from requests import get
 from os import getenv
 from datetime import datetime, timedelta
 import numpy as np
-from json import loads
+from json import loads, dumps
 
 def get_today_date():
     return str(datetime.now()).split()[0]
@@ -19,10 +19,10 @@ def get_struct_data(city, days):
     result['humidity'] = dict()
     result['pressure_mb'] = dict()
     api_key = getenv("Weather_API_Key")
-    temp_c = np.array([0] * 24)
-    humidity = np.array([0] * 24)
-    pressure_mb = np.array([0] * 24)
-    while days > 1:
+    temp_c = np.zeros(24)
+    humidity = np.zeros(24)
+    pressure_mb = np.zeros(24)
+    while days > 0:
         date = get_prev_date(days)
         url = "https://api.weatherapi.com/v1/history.json?key={}&q={}&dt={}".format(api_key, city, date)
         response = loads(get(url).text)
@@ -43,4 +43,5 @@ def get_struct_data(city, days):
     result['pressure_mb']['median'] = np.median(pressure_mb)
     result['pressure_mb']['min'] = np.min(pressure_mb)
     result['pressure_mb']['max'] = np.max(pressure_mb)
-    return result
+    print(result)
+    return dumps(result)
