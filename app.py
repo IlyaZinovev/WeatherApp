@@ -11,6 +11,12 @@ def get_today_date():
 def get_prev_date(days):
     return str(datetime.now() - timedelta(days=days-1)).split()[0]
 
+def api_key():
+    return getenv("Weather_API_Key")
+
+def url_for_request(city, date):
+    return "https://api.weatherapi.com/v1/history.json?key={}&q={}&dt={}".format(api_key(), city, date)
+
 app = Flask(__name__)
 
 
@@ -25,14 +31,12 @@ def get_weather():
     result['temperature_c'] = dict()
     result['humidity'] = dict()
     result['pressure_mb'] = dict()
-    api_key = getenv("Weather_API_Key")
     temp_c = np.zeros(24)
     humidity = np.zeros(24)
     pressure_mb = np.zeros(24)
     while days > 0:
         date = get_prev_date(days)
-        url = "https://api.weatherapi.com/v1/history.json?key={}&q={}&dt={}".format(api_key, city, date)
-        response = loads(get(url).text)
+        response = loads(get(url_for_request(city, date)).text)
         for hour in range(24):
             temp_c[hour] = response['forecast']['forecastday'][0]['hour'][hour]['temp_c']
             humidity[hour] = response['forecast']['forecastday'][0]['hour'][hour]['humidity']
@@ -50,5 +54,4 @@ def get_weather():
     result['pressure_mb']['median'] = np.median(pressure_mb)
     result['pressure_mb']['min'] = np.min(pressure_mb)
     result['pressure_mb']['max'] = np.max(pressure_mb)
-    print(result)
     return dumps(result)
