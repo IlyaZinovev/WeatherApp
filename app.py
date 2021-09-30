@@ -24,34 +24,37 @@ app = Flask(__name__)
 def get_weather():
     city = request.args.get("city", "")
     days = int(request.args.get("days", ""))
-    result = dict()
-    result['city'] = city
-    result['from'] = get_prev_date(days)
-    result['to'] = get_today_date()
-    result['temperature_c'] = dict()
-    result['humidity'] = dict()
-    result['pressure_mb'] = dict()
     temp_c = np.zeros(24)
     humidity = np.zeros(24)
     pressure_mb = np.zeros(24)
-    while days > 0:
-        date = get_prev_date(days)
+    for day in range(1, days + 1):
+        date = get_prev_date(day)
         response = loads(get(url_for_request(city, date)).text)
         for hour in range(24):
             temp_c[hour] = response['forecast']['forecastday'][0]['hour'][hour]['temp_c']
             humidity[hour] = response['forecast']['forecastday'][0]['hour'][hour]['humidity']
             pressure_mb[hour] = response['forecast']['forecastday'][0]['hour'][hour]['pressure_mb']
-        days -= 1
-    result['temperature_c']['average'] = np.mean(temp_c)
-    result['temperature_c']['median'] = np.median(temp_c)
-    result['temperature_c']['min'] = np.min(temp_c)
-    result['temperature_c']['max'] = np.max(temp_c)
-    result['humidity']['average'] = np.mean(humidity)
-    result['humidity']['median'] = np.median(humidity)
-    result['humidity']['min'] = np.min(humidity)
-    result['humidity']['max'] = np.max(humidity)
-    result['pressure_mb']['average'] = np.mean(pressure_mb)
-    result['pressure_mb']['median'] = np.median(pressure_mb)
-    result['pressure_mb']['min'] = np.min(pressure_mb)
-    result['pressure_mb']['max'] = np.max(pressure_mb)
+    result = {
+        'city': city,
+        'from': get_prev_date(days),
+        'to': get_today_date(),
+        'temperature_c': {
+            'average': np.mean(temp_c),
+            'median': np.median(temp_c),
+            'min': np.min(temp_c),
+            'max': np.max(temp_c)
+            },
+        'humidity': {
+            'average': np.mean(humidity),
+            'median': np.median(humidity),
+            'min': np.min(humidity),
+            'max': np.max(humidity)
+            },
+        'pressure_mb': {
+            'average': np.mean(pressure_mb),
+            'median': np.median(pressure_mb),
+            'min': np.min(pressure_mb),
+            'max': np.max(pressure_mb)
+            }
+        }    
     return dumps(result)
